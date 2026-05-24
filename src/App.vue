@@ -39,8 +39,9 @@ const rollbackSteps = [
 const isRunning = computed(() => status.value === 'upgrading' || status.value === 'rollingBack')
 const isUpgraded = computed(() => status.value === 'upgraded')
 const isRolledBack = computed(() => status.value === 'idle' || status.value === 'rolledBack')
-const actionLabel = computed(() => (isUpgraded.value ? '一键回退' : '一键升级'))
-const actionIcon = computed(() => (isUpgraded.value ? RotateCcw : Zap))
+const showRollbackAction = computed(() => isUpgraded.value || status.value === 'rollingBack')
+const actionLabel = computed(() => (showRollbackAction.value ? '一键回退' : '一键升级'))
+const actionIcon = computed(() => (showRollbackAction.value ? RotateCcw : Zap))
 const actionDisabled = computed(() => isRunning.value)
 
 const statusText = computed(() => {
@@ -84,7 +85,7 @@ function runSequence(mode) {
   pushLog(upgrading ? '用户已授权：开始执行硬件升级。' : '用户已授权：开始撤销升级。')
 
   timerId = setInterval(() => {
-    progress.value = Math.min(100, progress.value + Math.floor(Math.random() * 5) + 2)
+    progress.value = Math.min(100, progress.value + Math.floor(Math.random() * 5) + 3)
     const stepIndex = Math.min(steps.length - 1, Math.floor((progress.value / 100) * steps.length))
     activeStep.value = steps[stepIndex]
 
@@ -108,7 +109,7 @@ function runSequence(mode) {
       activeStep.value = upgrading ? '升级完成。' : '回退完成。'
       pushLog(upgrading ? `完成：当前显为 ${upgradedGpu}.` : `完成：当前显卡已恢复为 ${baseGpu}.`)
     }
-  }, 180)
+  }, 150)
 }
 
 function handleAction() {
